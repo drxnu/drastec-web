@@ -118,6 +118,7 @@ section.block{margin-top:44px}
 .fgroup{border-top:1px solid var(--line);padding-block:12px;display:flex;flex-direction:column;gap:6px}
 .fgroup:first-of-type{border-top:0}
 .fgroup label{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
+.fgroup select{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);font:inherit;font-size:14px}
 .fgroup .t{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
 .toolbar input,.toolbar select,.field input,.field select,.field textarea{background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:9px 12px;min-width:0}
@@ -286,7 +287,29 @@ footer .legalline{border-top:1px solid rgba(255,255,255,.12);padding-block:14px!
   footer .wrap{grid-template-columns:1fr 1fr}
 }
 @media (max-width:560px){
-  .trust,.flow,.svc,.fields{grid-template-columns:1fr}
+  .flow,.svc,.fields{grid-template-columns:1fr}
+  .trust{grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+  .trust div{padding:10px 12px}
+  .trust strong{font-size:13px}
+  .trust span{font-size:11.5px;line-height:1.35;display:block;margin-top:2px}
+  .slider .hero{padding:18px 18px 40px;gap:4px;grid-template-columns:1fr 92px;align-items:center}
+  .slider .hero h1{font-size:21px;line-height:1.15;margin-top:6px!important}
+  .slider .hero .eyebrow{font-size:10.5px}
+  .slider .hero p{font-size:13px;line-height:1.4;margin:6px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .slider .sprice{font-size:17px;margin-top:6px}
+  .slider .hero .ctas{margin-top:10px;gap:8px}
+  .slider .hero .ctas .btn{padding:8px 12px;font-size:13px}
+  .slider .hero .ctas .btn.ghost{display:none}
+  .slider .hero-art{overflow:hidden}
+  .slider .cpu3d,.slider .ssdart{padding:0}
+  .slider .cpu3d img{width:84px;-webkit-box-reflect:unset}
+  .slider .ssdart img{width:92px}
+  .slider .hero-art .terminal{display:none}
+  .slider .hero:has(.terminal){grid-template-columns:1fr}
+  .slider .hero-art svg{width:92px;height:auto}
+  .slider .sdots{bottom:14px}
+  .fgroup{display:grid;grid-template-columns:1fr 1fr;column-gap:14px}
+  .fgroup .t,.fgroup select,.fgroup input[type=range],.fgroup #fmaxv{grid-column:1/-1}
   .cats{grid-template-columns:repeat(2,1fr)}
   .grid{grid-template-columns:1fr 1fr;gap:10px}
   .card .body{padding:10px}
@@ -440,7 +463,23 @@ let tt; function toast(m){ const t=document.getElementById("toast"); t.textConte
 
 /* Vistas */
 const app = document.getElementById("app");
-const filters = {q:"",cat:new Set(),brand:new Set(),ram:new Set(),ssd:new Set(),cpu:new Set(),max:6000,sort:"rel",stock:false};
+const filters = {q:"",cat:new Set(),brand:new Set(),at:{},max:6000,sort:"rel",stock:false};
+function resetF(cat){ filters.cat.clear(); filters.brand.clear(); filters.at={}; if(cat) filters.cat.add(cat); }
+/* Filtros propios de cada categoría: [nombre, cómo se obtiene el valor del producto] */
+const rowv=(p,k)=>((p.rows||[]).find(r=>r[0].toLowerCase().startsWith(k.toLowerCase()))||[])[1]||"";
+const ptxt=p=>[p.name,...(p.spec||[]),...(p.rows||[]).map(r=>r[1])].join(" ");
+function chipsetOf(p){ const r=rowv(p,"Chipset"); const m=(r||p.name).match(/\b([ZBHXA]\d{3}[A-Z]?)\b/); return m?m[1]:""; }
+const ATTRS={
+  "Laptops":[["Procesador",p=>p.cpuf],["Memoria RAM",p=>p.ram?p.ram+" GB":""],["Almacenamiento",p=>p.ssd?(p.ssd>=1024?p.ssd/1024+" TB":p.ssd+" GB")+" SSD":""]],
+  "Procesadores":[["Socket",p=>(rowv(p,"Socket")||p.spec[0]||"").split(" ")[0]],["Núcleos",p=>(ptxt(p).match(/(\d+) núcleos/)||[])[1]?(ptxt(p).match(/(\d+) núcleos/))[1]+" núcleos":""]],
+  "Placas madre":[["Gama",p=>{const c=chipsetOf(p)[0];return c==="Z"||c==="X"?"Alta (Z / X)":c==="B"?"Media (B)":c==="H"||c==="A"?"Entrada (H / A)":"";}],["Chipset",chipsetOf],["Socket",p=>(rowv(p,"Socket")||p.spec[0]||"").split(" ")[0]],["Formato",p=>{const t=rowv(p,"Formato")||ptxt(p);return /micro\s?ATX|mATX|\dM\b/i.test(t)?"microATX":/mini.?ITX/i.test(t)?"Mini-ITX":/ATX/i.test(t)?"ATX":"";}]],
+  "Memorias RAM":[["Capacidad",p=>(ptxt(p).match(/(\d+)\s?GB/i)||[])[1]?(ptxt(p).match(/(\d+)\s?GB/i))[1]+" GB":""],["Tipo",p=>(ptxt(p).match(/DDR\d/i)||[""])[0].toUpperCase()],["Uso",p=>/laptop|so-?dimm/i.test(ptxt(p))?"Laptop":"PC de escritorio"]],
+  "Almacenamiento":[["Capacidad",p=>{const m=ptxt(p).match(/(\d+)\s?(TB|GB)/i);return m?m[1]+" "+m[2].toUpperCase():"";}],["Tipo",p=>{const t=ptxt(p);return /Gen\s?5|PCIe 5/i.test(t)?"SSD PCIe 5.0":/Gen\s?4|PCIe 4/i.test(t)?"SSD PCIe 4.0":/SATA/i.test(t)?"SSD SATA":/USB|extern/i.test(t)?"Disco externo":"";}]],
+  "Monitores":[["Tamaño",p=>(p.name.match(/(\d{2})"/)||[])[1]?p.name.match(/(\d{2})"/)[1]+'"':""],["Panel",p=>(ptxt(p).match(/\b(IPS|VA|TN|OLED)\b/)||[""])[0]]]
+};
+const attrsOf=c=>ATTRS[c]||[];
+const sortKey=v=>{v=String(v);if(/^Entrada/.test(v))return 1;if(/^Media/.test(v))return 2;if(/^Alta/.test(v))return 3;const m=v.match(/^(\d+(?:\.\d+)?)\s?(TB|GB)/i);return m?m[1]*(m[2].toUpperCase()==="TB"?1024:1):null;};
+const natSort=(a,b)=>{const x=sortKey(a),y=sortKey(b);return x!=null&&y!=null&&x!==y?x-y:String(a).localeCompare(String(b),"es",{numeric:true});};
 
 function viewHome(){
   const feat = P.filter(p=>p.tag).slice(0,4);
@@ -492,19 +531,23 @@ function catIcon(c){
   Redes:`<svg ${s}><path d="M2 9a15 15 0 0 1 20 0M5 13a10 10 0 0 1 14 0M8.5 16.5a5 5 0 0 1 7 0"/><circle cx="12" cy="20" r="1"/></svg>`}[c]||"";
 }
 
-function chk(group,val,label,n){ return `<label><input type="checkbox" data-f="${group}" value="${val}" ${filters[group].has(String(val))?"checked":""}> ${label} <span class="muted" style="margin-left:auto;font-size:12px">${n}</span></label>`; }
+function chk(group,val,label,n,key){ const set=key?(filters.at[key]||new Set()):filters[group]; return `<label><input type="checkbox" data-f="${group}" ${key?`data-k="${esc(key)}"`:""} value="${esc(val)}" ${set.has(String(val))?"checked":""}> ${esc(label)} <span class="muted" style="margin-left:auto;font-size:12px">${n}</span></label>`; }
 function viewCatalog(){
-  const uniq = k => [...new Set(P.filter(p=>p[k]!==undefined).map(p=>p[k]))];
-  const cnt = (k,v) => P.filter(p=>String(p[k])===String(v)).length;
+  const cat = filters.cat.size===1 ? [...filters.cat][0] : "";
+  const inCat = P.filter(p=>!cat||p.cat===cat);
+  const brands = [...new Set(inCat.map(p=>p.brand))].sort(natSort);
+  const groups = attrsOf(cat).map(([k,fn])=>{
+    const vals=[...new Set(inCat.map(fn).filter(Boolean))].sort(natSort);
+    return vals.length>1||filters.at[k]?.size ? `<div class="fgroup"><span class="t">${k}</span>${vals.map(v=>chk("at",v,v,inCat.filter(p=>fn(p)===v).length,k)).join("")}</div>` : "";
+  }).join("");
   return `
-  <div class="sechead"><div><div class="eyebrow">Catálogo</div><h1 style="font-size:28px;margin-top:4px">Laptops y accesorios</h1></div></div>
+  <div class="sechead"><div><div class="eyebrow">Catálogo</div><h1 style="font-size:28px;margin-top:4px">${cat?esc(cat):"Laptops y accesorios"}</h1></div></div>
   <div class="catalog">
     <aside class="filters" aria-label="Filtros">
-      <div class="fgroup"><span class="t">Categoría</span>${CATS.map(c=>chk("cat",c,c,cnt("cat",c))).join("")}</div>
-      <div class="fgroup"><span class="t">Marca</span>${uniq("brand").sort().map(b=>chk("brand",b,b,cnt("brand",b))).join("")}</div>
-      <div class="fgroup"><span class="t">Procesador (laptops)</span>${["Core i3","Core i5","Core i7","Ryzen 5","Ryzen 7","Apple M2"].map(c=>chk("cpu",c,c,cnt("cpuf",c))).join("")}</div>
-      <div class="fgroup"><span class="t">Memoria RAM</span>${[8,16].map(r=>chk("ram",r,r+" GB",cnt("ram",r))).join("")}</div>
-      <div class="fgroup"><span class="t">Almacenamiento</span>${[256,512,1024].map(s=>chk("ssd",s,s===1024?"1 TB SSD":s+" GB SSD",cnt("ssd",s))).join("")}</div>
+      <div class="fgroup"><span class="t">Categoría</span>
+        <select id="fcat" aria-label="Categoría"><option value="">Todas las categorías (${P.length})</option>${CATS.map(c=>`<option value="${esc(c)}" ${c===cat?"selected":""}>${esc(c)} (${P.filter(p=>p.cat===c).length})</option>`).join("")}</select></div>
+      <div class="fgroup"><span class="t">Marca${cat?" · "+esc(cat):""}</span>${brands.map(b=>chk("brand",b,b,inCat.filter(p=>p.brand===b).length)).join("")}</div>
+      ${groups}
       <div class="fgroup"><span class="t">Precio máximo</span><input type="range" id="fmax" min="50" max="6000" step="50" value="${filters.max}"><span class="mono tnum" id="fmaxv">${soles(filters.max)}</span></div>
       <div class="fgroup"><label><input type="checkbox" id="fstock" ${filters.stock?"checked":""}> Solo con stock</label></div>
       <button class="btn ghost" id="fclear" style="width:100%">Limpiar filtros</button>
@@ -526,9 +569,8 @@ function applyFilters(){
   let r = P.filter(p=>{
     if(filters.cat.size && !filters.cat.has(p.cat)) return false;
     if(filters.brand.size && !filters.brand.has(p.brand)) return false;
-    if(filters.cpu.size && !filters.cpu.has(p.cpuf)) return false;
-    if(filters.ram.size && !filters.ram.has(String(p.ram))) return false;
-    if(filters.ssd.size && !filters.ssd.has(String(p.ssd))) return false;
+    for(const [k,fn] of attrsOf(p.cat)){ const f=filters.at[k]; if(f&&f.size&&!f.has(String(fn(p)))) return false; }
+    if(Object.values(filters.at).some(f=>f.size) && !attrsOf(p.cat).length) return false;
     if(p.price!=null && p.price>filters.max) return false;
     if(filters.stock && p.stock===0) return false;
     if(filters.q){ const hay=[p.name,p.brand,p.cat,p.cpu,p.gpu,p.ram&&p.ram+"gb",...(p.spec||[])].join(" ").toLowerCase(); if(!filters.q.toLowerCase().split(/\s+/).every(w=>hay.includes(w))) return false; }
@@ -545,13 +587,14 @@ function applyFilters(){
 }
 function bindCatalog(){
   document.getElementById("fsort").value = filters.sort;
-  app.querySelectorAll("[data-f]").forEach(cb=>cb.addEventListener("change",e=>{ const g=filters[cb.dataset.f]; cb.checked?g.add(cb.value):g.delete(cb.value); applyFilters(); }));
+  app.querySelectorAll("[data-f]").forEach(cb=>cb.addEventListener("change",e=>{ const k=cb.dataset.k; const g=k?(filters.at[k]||(filters.at[k]=new Set())):filters[cb.dataset.f]; cb.checked?g.add(cb.value):g.delete(cb.value); applyFilters(); }));
+  document.getElementById("fcat").addEventListener("change",e=>{ resetF(e.target.value); render(); });
   document.getElementById("brandrow").addEventListener("click",e=>{ const b=e.target.closest("[data-brand]"); if(!b) return; const v=b.dataset.brand; if(!v) filters.brand.clear(); else if(filters.brand.has(v)) filters.brand.delete(v); else filters.brand.add(v); app.querySelectorAll('[data-f="brand"]').forEach(cb=>cb.checked=filters.brand.has(cb.value)); applyFilters(); });
   document.getElementById("fq").addEventListener("input",e=>{filters.q=e.target.value.trim(); applyFilters();});
   document.getElementById("fsort").addEventListener("change",e=>{filters.sort=e.target.value; applyFilters();});
   document.getElementById("fmax").addEventListener("input",e=>{filters.max=+e.target.value; document.getElementById("fmaxv").textContent=soles(filters.max); applyFilters();});
   document.getElementById("fstock").addEventListener("change",e=>{filters.stock=e.target.checked; applyFilters();});
-  document.getElementById("fclear").addEventListener("click",()=>{ ["cat","brand","ram","ssd","cpu"].forEach(k=>filters[k].clear()); Object.assign(filters,{q:"",max:6000,sort:"rel",stock:false}); render(); });
+  document.getElementById("fclear").addEventListener("click",()=>{ resetF(); Object.assign(filters,{q:"",max:6000,sort:"rel",stock:false}); render(); });
   applyFilters();
 }
 
@@ -843,10 +886,10 @@ function bindHome(){
   sl.addEventListener("click",e=>{
     const a=e.target.closest("[data-s]"); if(a){ showSlide(slideIdx+(+a.dataset.s)); startSlides(); return; }
     const d=e.target.closest("[data-dot]"); if(d){ showSlide(+d.dataset.dot); startSlides(); return; }
-    const c=e.target.closest("[data-cpu]"); if(c){ ["cat","brand","ram","ssd","cpu"].forEach(k=>filters[k].clear()); filters.cat.add("Laptops"); c.dataset.cpu.split(",").forEach(v=>filters.cpu.add(v)); }
-    const k=e.target.closest("[data-kit]"); if(k){ ["cat","brand","ram","ssd","cpu"].forEach(x=>filters[x].clear()); filters.cat.add("Procesadores"); filters.brand.add(k.dataset.kit); }
-    const sd=e.target.closest("[data-ssd]"); if(sd){ ["cat","brand","ram","ssd","cpu"].forEach(x=>filters[x].clear()); filters.cat.add("Almacenamiento"); }
-    const b=e.target.closest("[data-brand]"); if(b){ ["cat","brand","ram","ssd","cpu"].forEach(k=>filters[k].clear()); filters.cat.add("Laptops"); filters.brand.add(b.dataset.brand); }
+    const c=e.target.closest("[data-cpu]"); if(c){ resetF("Laptops"); filters.at.Procesador=new Set(c.dataset.cpu.split(",")); }
+    const k=e.target.closest("[data-kit]"); if(k){ resetF("Procesadores"); filters.brand.add(k.dataset.kit); }
+    const sd=e.target.closest("[data-ssd]"); if(sd){ resetF("Almacenamiento"); }
+    const b=e.target.closest("[data-brand]"); if(b){ resetF("Laptops"); filters.brand.add(b.dataset.brand); }
   });
   sl.addEventListener("mouseenter",()=>clearInterval(slideTimer));
   sl.addEventListener("mouseleave",startSlides);
@@ -985,7 +1028,7 @@ function render(){
 }
 document.addEventListener("click",e=>{
   const add=e.target.closest("[data-add]"); if(add){ e.stopPropagation(); addToCart(add.dataset.add); return; }
-  const cat=e.target.closest("[data-cat]"); if(cat){ filters.cat=new Set([cat.dataset.cat]); }
+  const cat=e.target.closest("[data-cat]"); if(cat){ resetF(cat.dataset.cat); }
   const go=e.target.closest("[data-go]"); if(go){ location.hash=go.dataset.go; }
 });
 document.addEventListener("keydown",e=>{ const go=e.target.closest&&e.target.closest("[data-go]"); if(go&&e.key==="Enter"&&e.target===go) location.hash=go.dataset.go; });
@@ -993,7 +1036,7 @@ window.addEventListener("hashchange",()=>{ render(); window.scrollTo(0,0); });
 
 
 document.getElementById("wabtn").addEventListener("click",()=>{const p=document.getElementById("wapop"),b=document.getElementById("wabtn"); p.hidden=!p.hidden; b.setAttribute("aria-expanded",String(!p.hidden));});
-document.getElementById("hsearch").addEventListener("submit",e=>{e.preventDefault(); const q=document.getElementById("hq").value.trim(); ["cat","brand","ram","ssd","cpu"].forEach(k=>filters[k].clear()); filters.q=q; if(location.hash==="#catalogo") render(); else location.hash="catalogo";});
+document.getElementById("hsearch").addEventListener("submit",e=>{e.preventDefault(); const q=document.getElementById("hq").value.trim(); resetF(); filters.q=q; if(location.hash==="#catalogo") render(); else location.hash="catalogo";});
 saveCart(); render(); loadSheet();
 </script>
 
