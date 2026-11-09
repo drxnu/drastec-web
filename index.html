@@ -620,7 +620,7 @@ function viewCart(){
           <label><input type="radio" name="doc" value="factura" ${checkout.doc==="factura"?"checked":""}><span><b>Factura</b><small>Para empresas, con RUC</small></span></label>
         </div>
         <div class="fields" id="factf" ${checkout.doc==="factura"?"":"hidden"}>
-          <label class="field">RUC<input id="c-ruc" inputmode="numeric" maxlength="11" value="${esc(checkout.ruc)}" placeholder="11 dígitos (10… o 20…)"></label>
+          <label class="field"><span style="display:flex;justify-content:space-between;gap:8px">RUC <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank" rel="noopener" style="font-weight:500">Consultar en SUNAT ↗</a></span><input id="c-ruc" inputmode="numeric" maxlength="11" value="${esc(checkout.ruc)}" placeholder="11 dígitos (10… o 20…)"></label>
           <label class="field">Razón social<input id="c-rs" value="${esc(checkout.rs)}" placeholder="Ej. Empresa S.A.C."></label>
           <label class="field" style="grid-column:1/-1">Dirección fiscal<input id="c-dirf" value="${esc(checkout.dirf)}" placeholder="Tal como figura en SUNAT"></label>
         </div>
