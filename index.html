@@ -261,7 +261,7 @@ html,body{overflow-x:clip}
   .slider .slide{padding-inline:48px;height:100%}
   .slide.intel .hero-art{position:absolute;right:48px;top:7%;bottom:-6%;width:auto}
   .slide.intel .pcb{height:100%;width:auto}
-  .sarrow.prev{right:auto;left:18px}.sarrow.next{right:auto;left:60px}
+  .sarrow.prev{left:auto;right:60px}.sarrow.next{left:auto;right:18px}
 }
 /* PC animada: torre negra con vidrio; el procesador entra al socket, luego aparece la bomba de agua; ventiladores giran suave */
 .pcb{position:relative;aspect-ratio:430/485;width:min(360px,100%);margin:0 auto}
@@ -385,12 +385,19 @@ html[data-theme="dark"] .wapop{background:var(--surface);color:var(--fg);border-
 html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea{background:#0E121B;border-color:var(--line);color:var(--fg)}
 </style>
 <style>
-/* Anuncio de PC con foto (img/pc-destacada.webp): foto pegada a la derecha que se funde en negro hacia el texto */
-.slide.intel{background:#000!important}
-.slide.intel .hero-art{position:absolute!important;inset:0 0 0 auto!important;top:0!important;bottom:0!important;right:0!important;height:100%;width:auto;display:block}
-.slide.intel .pcphoto{display:block;height:100%;width:auto;max-width:none;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 28%);mask-image:linear-gradient(90deg,transparent 0,#000 28%)}
-.slide.intel > div:first-child{position:relative;z-index:1}
-@media (max-width:900px){.slider .hero.intel{grid-template-columns:1fr!important}.slide.intel .pcphoto{opacity:.55;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 45%);mask-image:linear-gradient(90deg,transparent 0,#000 45%)}}
+/* Anuncio Intel con imágenes oficiales Core Ultra (fondo de puntos azules + 3 procesadores) */
+.slide.intel{background:linear-gradient(90deg,rgba(2,6,30,.96) 0%,rgba(2,6,30,.8) 40%,rgba(2,6,30,.15) 70%),url(img/fondo-ultra.webp) center/cover no-repeat,#020617!important}
+.slide.intel .hero-art{display:grid;place-items:center}
+.slide.intel .ultra{height:min(86%,440px);max-height:440px;width:auto;filter:drop-shadow(0 24px 40px rgba(0,0,0,.6)) drop-shadow(0 0 40px rgba(60,120,255,.35))}
+@media (min-width:901px){.slide.intel .hero-art{position:absolute;right:48px;top:0;bottom:0;height:100%}}
+@media (max-width:900px){.slide.intel .ultra{height:auto;width:100%;max-width:150px}}
+/* Anuncio "Ensámblala desde tu casa": foto de la PC pegada a la derecha que se funde en negro */
+.slide.pcarma{background:#000!important}
+.slide.pcarma .hero-art{position:absolute;inset:0 0 0 auto;height:100%;width:auto;display:block}
+.slide.pcarma .pcphoto{display:block;height:100%;width:auto;max-width:none;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 28%);mask-image:linear-gradient(90deg,transparent 0,#000 28%)}
+.slide.pcarma > div:first-child{position:relative;z-index:1}
+.slide.pcarma h1{font-size:clamp(24px,2.9vw,38px)!important;max-width:16ch}
+@media (max-width:900px){.slider .hero.pcarma{grid-template-columns:1fr!important}.slide.pcarma .pcphoto{opacity:.5;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 45%);mask-image:linear-gradient(90deg,transparent 0,#000 45%)}}
 </style>
 </head>
 <body>
@@ -943,7 +950,8 @@ const CPU_AMD="img/cpu-amd-foto.webp";
 const CPU_AMD_FLAT="img/cpu-amd.webp";
 const SSD_CRUCIAL="img/ssd-crucial-t700.webp";
 const SLIDES=[
- {cls:"intel",eye:"Nuevo · Procesadores Intel",h:"Nuevo <em>Intel Core Ultra 7</em> 270K Plus",p:"24 núcleos hasta 5.5 GHz para gaming, diseño y edición. Combínalo con placas Z890 o B860 y memoria DDR5-6000.",bg:"linear-gradient(115deg,#00285A 40%,#0068B5)",acc:"#00C7FD",accfg:"#00285A",ctas:`<a class="btn orange" href="#producto-cp-01">Ver procesador</a><a class="btn ghost" href="#catalogo" data-kit="Intel">Todos los Intel</a>`,art:()=>`<img class="pcphoto" src="img/pc-destacada.webp" alt="PC gamer con refrigeración líquida">`,dur:8000},
+ {cls:"intel",eye:"Nuevo · Procesadores Intel",h:"Nuevo <em>Intel Core Ultra 7</em> 270K Plus",p:"24 núcleos hasta 5.5 GHz para gaming, diseño y edición. Combínalo con placas Z890 o B860 y memoria DDR5-6000.",bg:"linear-gradient(115deg,#00285A 40%,#0068B5)",acc:"#00C7FD",accfg:"#00285A",ctas:`<a class="btn orange" href="#producto-cp-01">Ver procesador</a><a class="btn ghost" href="#catalogo" data-kit="Intel">Todos los Intel</a>`,art:()=>`<img class="ultra" src="img/chips3.webp" alt="Procesadores Intel Core Ultra">`},
+ {cls:"pcarma",eye:"PC a tu medida · Entrega el mismo día",h:"Ensámblala desde tu casa, <em>nosotros la llevamos el mismo día</em> a tus manos.",p:"Elige cada pieza en la web, nosotros armamos y probamos tu PC y te la entregamos lista para usar.",bg:"#000",acc:"#9EF01A",accfg:"#0A0F02",em:"#9EF01A",ctas:`<a class="btn orange" href="#catalogo" data-cat="Procesadores">Elegir piezas</a><a class="btn ghost" href="https://wa.me/51958842548?text=Hola%2C%20quiero%20armar%20mi%20PC" target="_blank" rel="noopener">Cotizar por WhatsApp</a>`,art:()=>`<img class="pcphoto" src="img/pc-destacada.webp" alt="PC gamer armada con refrigeración líquida">`,dur:7000},
  {cls:"amd",eye:"Nuevo · Procesadores AMD",h:"<em>Ryzen 5 7500X3D</em> con 3D V-Cache para gaming",p:"96 MB de caché L3 para más FPS en tus juegos. Socket AM5, 65 W y gráficos Radeon integrados.",bg:"linear-gradient(115deg,#000000 50%,#4a0408)",acc:"#ED1C24",accfg:"#FFFFFF",ctas:`<a class="btn orange" href="#producto-cp-04">Ver procesador</a>`,art:()=>`<div class="cpu3d right"><div class="tilt"><img src="${CPU_AMD_FLAT}" alt="Procesador AMD Ryzen"></div></div>`},
  {cls:"ssd",eye:"Almacenamiento · PCIe Gen5",h:"Crucial T700: <em>hasta 11,700 MB/s</em>",p:"SSD M.2 PCIe Gen5 de 1 TB con disipador incluido. El salto de velocidad para tu PC gamer o de trabajo pesado.",bg:"#000",acc:"#FFC72C",accfg:"#111111",ctas:`<a class="btn orange" href="#producto-sd-02">Ver Crucial T700</a><a class="btn ghost" href="#catalogo" data-ssd="1">Todos los SSD</a>`,art:()=>`<div class="ssdart"><img src="${SSD_CRUCIAL}" alt="SSD Crucial T700"></div>`},
  {eye:"Para tu oficina · Dell",h:"Dell Inspiron 15, <em>lista para trabajar</em>",p:"Core i5, 8 GB RAM, SSD 512 GB y pantalla 15.6\" a 120 Hz. Con Windows 11, garantía local y configuración inicial incluida.",price:"S/ 2,449.00",bg:"linear-gradient(115deg,#00447C 35%,#007DB8)",acc:"#FFFFFF",accfg:"#007DB8",em:"#9FDBF7",ctas:`<a class="btn orange" href="#producto-lp-10">Ver Dell Inspiron</a><a class="btn ghost" href="#catalogo" data-brand="Dell">Más Dell</a>`,art:()=>`<div style="display:grid;place-items:center">${art(byId("lp-10"),300)}</div>`},
