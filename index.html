@@ -253,6 +253,12 @@ footer a{color:#B9C7DD;text-decoration:none;display:block;padding-block:2px}
 .catstrip a:hover{border-color:var(--blue);transform:translateY(-2px)}
 .catstrip .ic{width:44px;height:44px;border-radius:50%;background:var(--soft);display:grid;place-items:center;color:var(--navy)}
 .catstrip .ic svg{width:22px;height:22px}
+.catnav{display:flex;overflow-x:auto;gap:10px;margin:0 0 18px;padding-bottom:4px;scrollbar-width:thin}
+.catnav button{flex:1 0 104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:100px;background:var(--surface);border:1px solid var(--line);border-radius:12px;color:var(--fg);font:700 12.5px var(--sans);cursor:pointer;box-shadow:0 2px 8px rgba(15,27,45,.05)}
+.catnav button small{font-weight:500;color:var(--muted);font-size:11px;margin-top:-4px}
+.catnav button:hover{border-color:var(--blue)}
+.catnav button.on{border-color:var(--blue);background:var(--soft);color:var(--blue)}
+.catnav button.on .ic{background:var(--blue);color:#fff}
 @media (max-width:900px){.catstrip{display:flex;overflow-x:auto;gap:10px;scrollbar-width:none;padding-bottom:2px}.catstrip::-webkit-scrollbar{display:none}.catstrip a{flex:0 0 104px;height:88px;font-size:12px}}
 /* Anuncio principal: de borde a borde con margen fino y esquinas redondas; en computadora llena la ventana visible (--chrome = alto de cabecera + franja) */
 html,body{overflow-x:clip}
@@ -606,7 +612,7 @@ function catIcon(c){
   "Procesadores":`<svg ${s}><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg>`,
   "Placas madre":`<svg ${s}><rect x="3" y="3" width="18" height="18" rx="1.5"/><rect x="6" y="6" width="6" height="6"/><path d="M15 6v6M18 6v6M6 15h12M6 18h8"/></svg>`,
   "Periféricos":`<svg ${s}><rect x="7" y="3" width="10" height="18" rx="5"/><path d="M12 3v6"/></svg>`,
-  Redes:`<svg ${s}><path d="M2 9a15 15 0 0 1 20 0M5 13a10 10 0 0 1 14 0M8.5 16.5a5 5 0 0 1 7 0"/><circle cx="12" cy="20" r="1"/></svg>`}[c]||"";
+  "Energía":`<svg ${s}><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></svg>`,Redes:`<svg ${s}><path d="M2 9a15 15 0 0 1 20 0M5 13a10 10 0 0 1 14 0M8.5 16.5a5 5 0 0 1 7 0"/><circle cx="12" cy="20" r="1"/></svg>`}[c]||"";
 }
 
 function chk(group,val,label,n,key){ const set=key?(filters.at[key]||new Set()):filters[group]; return `<label><input type="checkbox" data-f="${group}" ${key?`data-k="${esc(key)}"`:""} value="${esc(val)}" ${set.has(String(val))?"checked":""}> ${esc(label)} <span class="muted" style="margin-left:auto;font-size:12px">${n}</span></label>`; }
@@ -620,6 +626,7 @@ function viewCatalog(){
   }).join("");
   return `
   <div class="sechead"><div><div class="eyebrow">Catálogo</div><h1 style="font-size:28px;margin-top:4px">${cat?esc(cat):"Laptops y accesorios"}</h1></div></div>
+  <nav class="catstrip catnav" aria-label="Categorías">${[["","Todo"],...CATS.map(c=>[c,c==="Almacenamiento"?"Discos SSD":c])].map(([c,l])=>`<button type="button" data-catnav="${esc(c)}" class="${c===cat?"on":""}" aria-pressed="${c===cat}"><span class="ic">${c?catIcon(c):'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>'}</span>${esc(l)}<small>${c?P.filter(p=>p.cat===c).length:P.length}</small></button>`).join("")}</nav>
   <div class="catalog">
     <aside class="filters" aria-label="Filtros">
       <div class="fgroup"><span class="t">Categoría</span>
@@ -667,6 +674,8 @@ function bindCatalog(){
   document.getElementById("fsort").value = filters.sort;
   app.querySelectorAll("[data-f]").forEach(cb=>cb.addEventListener("change",e=>{ const k=cb.dataset.k; const g=k?(filters.at[k]||(filters.at[k]=new Set())):filters[cb.dataset.f]; cb.checked?g.add(cb.value):g.delete(cb.value); applyFilters(); }));
   document.getElementById("fcat").addEventListener("change",e=>{ resetF(e.target.value); render(); });
+  app.querySelectorAll("[data-catnav]").forEach(b=>b.addEventListener("click",()=>{ resetF(b.dataset.catnav); render(); }));
+  { const nav=app.querySelector(".catnav"), on=nav&&nav.querySelector(".on"); if(on) nav.scrollLeft=on.offsetLeft-(nav.clientWidth-on.offsetWidth)/2; }
   document.getElementById("brandrow").addEventListener("click",e=>{ const b=e.target.closest("[data-brand]"); if(!b) return; const v=b.dataset.brand; if(!v) filters.brand.clear(); else if(filters.brand.has(v)) filters.brand.delete(v); else filters.brand.add(v); app.querySelectorAll('[data-f="brand"]').forEach(cb=>cb.checked=filters.brand.has(cb.value)); applyFilters(); });
   document.getElementById("fq").addEventListener("input",e=>{filters.q=e.target.value.trim(); applyFilters();});
   document.getElementById("fsort").addEventListener("change",e=>{filters.sort=e.target.value; applyFilters();});
