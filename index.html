@@ -4,13 +4,15 @@
 <script>try{var t=localStorage.getItem("dt-theme");if(t==="dark")document.documentElement.setAttribute("data-theme","dark")}catch(e){}</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DrasTec · Laptops, componentes y soporte técnico en Lima</title>
+<title>DTEC · Laptops, componentes y soporte técnico en Lima</title>
 <meta name="description" content="DrasTec: venta de laptops, procesadores, placas madre, memorias y SSD con garantía en Perú. Soporte técnico en Lima. Paga por transferencia o Yape y coordina por WhatsApp.">
 <meta property="og:title" content="DrasTec · Tecnología y soporte técnico">
 <meta property="og:description" content="Laptops y componentes con garantía en Perú. Envíos a todo el país.">
 <meta property="og:image" content="img/cpu-intel.webp">
 <meta name="theme-color" content="#0B0B0F">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Crect x='3' y='3' width='24' height='24' rx='5' fill='%23fff' stroke='%233B82F6' stroke-width='2.5'/%3E%3Cpath d='M10 15.5l3.5 3.5L20.5 11' fill='none' stroke='%230B2545' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="img/logo/favicon-dtec-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="img/logo/favicon-dtec-192.png">
+<link rel="apple-touch-icon" href="img/logo/favicon-dtec-192.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Store","name":"DrasTec","legalName":"DRASTEC IMPORT S.A.C.","taxID":"20615647480","telephone":"+51958842548","email":"dxn@drastec.com","address":{"@type":"PostalAddress","streetAddress":"Av. Miramar Mz. N Lote 28, Dpto. 2 Int. 2, Urb. Santa Isabel","addressLocality":"Chorrillos","addressRegion":"Lima","addressCountry":"PE"},"currenciesAccepted":"PEN","paymentAccepted":"Transferencia bancaria, Yape, Plin"}</script>
 <style>html,body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -371,6 +373,11 @@ footer .legalline{border-top:1px solid rgba(255,255,255,.12);padding-block:14px!
 
 /* Tema oscuro (botón luna/sol en la cabecera) */
 .themebtn{display:grid;place-items:center;width:38px;height:38px;border-radius:8px;border:1.5px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;flex:none}
+.logo img{display:block;height:28px;width:auto}
+footer .logo img{height:24px}
+.logo .lg-dark{display:none}
+html[data-theme="dark"] .logo .lg-light{display:none}
+html[data-theme="dark"] .logo .lg-dark{display:block}
 .themebtn:hover{background:var(--soft)}
 .themebtn .sun{display:none}
 html[data-theme="dark"] .themebtn .sun{display:block}
@@ -412,10 +419,7 @@ html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="da
 
 <header class="top">
   <div class="wrap">
-    <a class="logo" href="#inicio" aria-label="DrasTec inicio">
-      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect x="3" y="3" width="24" height="24" rx="5" fill="none" style="stroke:var(--orange)" stroke-width="2.5"/><path d="M10 15.5l3.5 3.5L20.5 11" fill="none" stroke="#0F1B2D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span>Dras<b>Tec</b></span>
-    </a>
+    <a class="logo" href="#inicio" aria-label="DrasTec inicio"><img class="lg-light" src="img/logo/dtec-fondo-claro.svg" alt="DTEC" height="28"><img class="lg-dark" src="img/logo/dtec-fondo-oscuro-azul.svg" alt="DTEC" height="28"></a>
     <nav class="main" aria-label="Principal">
       <a href="#inicio" data-nav="inicio">Inicio</a>
       <a href="#catalogo" data-nav="catalogo">Catálogo</a>
@@ -433,7 +437,7 @@ html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="da
 <footer>
   <div class="wrap">
     <div>
-      <div class="logo" style="margin-bottom:8px"><span>Dras<b>Tec</b></span></div>
+      <div class="logo" style="margin-bottom:10px"><img src="img/logo/drastec-fondo-oscuro-azul.svg" alt="DRASTEC" height="24"></div>
       <p style="margin:0 0 10px;max-width:34ch">Venta y soporte técnico de equipos de cómputo. Envíos a todo el Perú con garantía local.</p>
       <a class="lrbadge" href="#reclamaciones"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h12l4 4v12H4z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg>Libro de Reclamaciones</a>
     </div>
