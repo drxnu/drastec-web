@@ -143,6 +143,10 @@ section.block{margin-top:44px}
 .crumbs a{text-decoration:none}
 .pdp h1{font-size:clamp(24px,3vw,32px);letter-spacing:-.02em;margin-block:6px 10px}
 .pdp .price{font-size:32px;margin-block:10px}
+.shipok{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;background:#16A34A;color:#fff;font-weight:700;font-size:12px;line-height:1;border-radius:99px;padding:6px 11px;margin:6px 0;animation:shipblink 1.4s ease-in-out infinite}
+.shipok .dot{width:8px;height:8px;border-radius:99px;background:#fff}
+@keyframes shipblink{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(22,163,74,.45)}50%{opacity:.6;box-shadow:0 0 0 5px rgba(22,163,74,0)}}
+@media (prefers-reduced-motion:reduce){.shipok{animation:none}}
 .stock{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:14px}
 .qty{display:inline-flex;border:1.5px solid var(--line);border-radius:8px;overflow:hidden}
 .qty button{background:var(--surface);border:0;width:36px;cursor:pointer;font-size:18px}
@@ -462,7 +466,8 @@ html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="da
 
 <script>
 const WA = "51958842548"; // asesor de ventas
-const SHIP = {lima:15, provincia:25};
+const SHIP = {lima:0, provincia:0}; /* envío a domicilio incluido en el precio */
+const shipBadge=p=>p&&p.price!=null?`<span class="shipok"><span class="dot" aria-hidden="true"></span>Envío a domicilio cubierto</span>`:"";
 const FX = 3.49; // tipo de cambio referencial de ejemplo
 document.getElementById("fxv").textContent = FX.toFixed(2);
 let P = [
@@ -543,6 +548,7 @@ function card(p){
       <h3>${esc(p.name)}</h3>
       <div class="specs">${specLine(p).map(s=>`<span>${esc(s)}</span>`).join("")}</div>
       <div class="price">${priceHtml(p)}</div>
+      ${shipBadge(p)}
       ${stockPill(p)}
       <button class="btn add" data-add="${p.id}" ${noBuy(p)?"disabled":""}>${p.price==null?"Próximamente":"Agregar al carrito"}</button>
     </div></article>`;
@@ -596,7 +602,7 @@ function viewHome(){
   <nav class="catstrip" aria-label="Categorías">${[["Laptops","Laptops"],["Procesadores","Procesadores"],["Placas madre","Placas madre"],["Memorias RAM","Memorias RAM"],["Almacenamiento","Discos sólidos SSD"],["Monitores","Monitores"]].map(([c,l])=>`<a href="#catalogo" data-cat="${c}"><span class="ic">${catIcon(c)}</span>${l}</a>`).join("")}</nav>
   <div class="trust">
     <div><strong>Garantía local</strong><span>12 meses en laptops, atención en Lima</span></div>
-    <div><strong>Envíos a todo el Perú</strong><span>Lima 24–48 h · provincias 2–4 días</span></div>
+    <div><strong>Envío a domicilio cubierto</strong><span>A todo el Perú · Lima 24–48 h · provincias 2–4 días</span></div>
     <div><strong>Pago seguro</strong><span>Transferencia, Yape/Plin o pago de servicios</span></div>
     <div><strong>Soporte propio</strong><span>Diagnóstico, mantenimiento y upgrades</span></div>
   </div>
@@ -709,14 +715,15 @@ function viewProduct(id){
       <div class="stock">${stockPill(p)} ${p.tag?`<span class="pill">${p.tag}</span>`:""}</div>
       <div class="price">${priceHtml(p)}</div>
       ${p.price==null?"":`<div class="usd">≈ US$ ${(p.price/FX).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} al tipo de cambio de S/ ${FX.toFixed(2)}</div>`}
-      <p class="muted" style="margin:0">Precio incluye IGV. Boleta o factura electrónica.</p>
+      ${shipBadge(p)}
+      <p class="muted" style="margin:0">Precio incluye IGV y envío a domicilio. Boleta o factura electrónica.</p>
       <div class="buyrow">
         <div class="qty"><button id="qm" aria-label="Menos">−</button><span id="qv" class="tnum">1</span><button id="qp" aria-label="Más">+</button></div>
         <button class="btn" id="padd" ${noBuy(p)?"disabled":""}>Agregar al carrito</button>
         <button class="btn orange" id="pbuy" ${noBuy(p)?"disabled":""}>Comprar ahora</button>
       </div>
       <div class="perks">
-        <div>${tick()}<span><b>Envío</b> Lima ${soles(SHIP.lima)} (24–48 h) · Provincias ${soles(SHIP.provincia)} (2–4 días)</span></div>
+        <div>${tick()}<span><b>Envío a domicilio cubierto</b> Lima 24–48 h · Provincias 2–4 días</span></div>
         <div>${tick()}<span><b>Recojo gratis</b> en tienda, previa coordinación</span></div>
         <div>${tick()}<span><b>Soporte post-venta</b> configuración inicial y migración de archivos</span></div>
       </div>
@@ -783,7 +790,7 @@ function viewCart(){
       <h2>Resumen</h2>
       <div class="totals tnum">
         <div><span>Subtotal (${t.lines.reduce((a,l)=>a+l.q,0)} artículos)</span><span>${soles(t.sub)}</span></div>
-        <div><span>Envío</span><span id="tship">${t.ship?soles(t.ship):"Gratis"}</span></div>
+        <div><span>Envío</span><span id="tship">${t.ship?soles(t.ship):"Cubierto"}</span></div>
         <div class="grand"><span>Total</span><span id="ttotal">${soles(t.total)}</span></div>
       </div>
       <button class="btn orange" id="confirm" style="width:100%;margin-top:16px">Confirmar pedido</button>
@@ -815,7 +822,7 @@ function bindCart(){
   app.querySelectorAll('input[name="doc"]').forEach(r=>r.onchange=()=>{ document.getElementById("factf").hidden=(r.value!=="factura"); });
   app.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ readForm(); const p=byId(b.dataset.q); cart[p.id]=Math.max(0,Math.min(p.stock,(cart[p.id]||0)+(+b.dataset.d))); if(!cart[p.id]) delete cart[p.id]; saveCart(); render(); });
   app.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{ readForm(); delete cart[b.dataset.rm]; saveCart(); render(); });
-  z.onchange=()=>{ readForm(); const t=totals(); document.getElementById("tship").textContent=t.ship?soles(t.ship):"Gratis"; document.getElementById("ttotal").textContent=soles(t.total); };
+  z.onchange=()=>{ readForm(); const t=totals(); document.getElementById("tship").textContent=t.ship?soles(t.ship):"Cubierto"; document.getElementById("ttotal").textContent=soles(t.total); };
   document.getElementById("cform").addEventListener("submit",e=>e.preventDefault());
   document.getElementById("confirm").onclick=()=>{
     readForm();
@@ -843,7 +850,7 @@ function waText(){
   const pay={transfer:"Transferencia bancaria",yape:"Yape / Plin",servicios:"Pago de servicios"}[d.pay];
   const ent={lima:"Envío Lima",provincia:"Envío a provincia",recojo:"Recojo en tienda"}[d.zone];
   return `Hola DrasTec, confirmo mi pedido ${o.code}:\n`+o.lines.map(l=>`• ${l.q} x ${l.p.name} – ${soles(l.p.price*l.q)}`).join("\n")+
-  `\nEnvío: ${o.ship?soles(o.ship):"Gratis"}\nTOTAL: ${soles(o.total)}\n\nComprobante: ${d.doc==="factura"?`FACTURA\nRUC: ${d.ruc}\nRazón social: ${d.rs}\nDirección fiscal: ${d.dirf}`:"BOLETA"}\n\nNombre: ${d.name}\nDNI: ${d.dni}\nEntrega: ${ent}${d.zone!=="recojo"?" – "+d.addr:""}\nPago: ${pay}\n\nAdjunto mi constancia de pago.`;
+  `\nEnvío: ${o.ship?soles(o.ship):"Cubierto"}\nTOTAL: ${soles(o.total)}\n\nComprobante: ${d.doc==="factura"?`FACTURA\nRUC: ${d.ruc}\nRazón social: ${d.rs}\nDirección fiscal: ${d.dirf}`:"BOLETA"}\n\nNombre: ${d.name}\nDNI: ${d.dni}\nEntrega: ${ent}${d.zone!=="recojo"?" – "+d.addr:""}\nPago: ${pay}\n\nAdjunto mi constancia de pago.`;
 }
 function viewOrder(){
   const o=order;
@@ -1037,7 +1044,7 @@ ${[["¿Cómo compro?","Agrega tus productos al carrito, completa tus datos y con
 ["¿Los productos tienen garantía?","Sí. Todos los productos tienen garantía según el fabricante y el tipo de producto. El plazo se indica en la ficha de cada producto."],
 ["¿Venden al extranjero?","No. Por temas de garantía y soporte, solo vendemos a clientes dentro del Perú."]].map(q=>`<details><summary>${q[0]}</summary><p>${q[1]}</p></details>`).join("")}</div>`,
 envios:()=>`<div class="legal"><div class="eyebrow">Ayuda</div><h1>Envíos, cambios y devoluciones</h1><p class="meta">Actualizado el ${UPD}</p>
-<h2>Envíos</h2><ul><li><b>Lima Metropolitana:</b> 24 a 48 horas hábiles después de confirmado el pago.</li><li><b>Provincias:</b> 2 a 4 días hábiles por agencia de transporte, según el destino.</li><li><b>Recojo:</b> previa coordinación por WhatsApp.</li><li>El costo del envío se muestra en el carrito antes de confirmar tu pedido.</li></ul>
+<h2>Envíos</h2><ul><li><b>Lima Metropolitana:</b> 24 a 48 horas hábiles después de confirmado el pago.</li><li><b>Provincias:</b> 2 a 4 días hábiles por agencia de transporte, según el destino.</li><li><b>Recojo:</b> previa coordinación por WhatsApp.</li><li>El envío a domicilio ya está incluido en el precio de cada producto: no pagas nada adicional al recibirlo.</li></ul>
 <h2>Al recibir tu pedido</h2><p>Revisa que la caja esté sellada y sin golpes. Si notas algún daño, anótalo en la guía del transportista y escríbenos el mismo día por WhatsApp con fotos.</p>
 <h2>Cambios y devoluciones</h2><ul><li>Puedes solicitar un cambio o devolución por producto defectuoso o distinto al pedido.</li><li>El producto debe estar completo, con su caja, accesorios y comprobante.</li><li>Escríbenos por WhatsApp o al correo ${EMP.mail} indicando tu número de pedido.</li><li>Si tu solicitud procede, cambiamos el producto o devolvemos tu dinero por el mismo medio de pago.</li></ul>
 <h2>Garantía</h2><p>La garantía cubre defectos de fabricación según las condiciones del fabricante. No cubre daños por golpes, líquidos, mala manipulación, variaciones de voltaje ni reparaciones hechas por terceros.</p>
