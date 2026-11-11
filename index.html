@@ -373,7 +373,8 @@ footer .legalline{border-top:1px solid rgba(255,255,255,.12);padding-block:14px!
 
 /* Tema oscuro (botón luna/sol en la cabecera) */
 .themebtn{display:grid;place-items:center;width:38px;height:38px;border-radius:8px;border:1.5px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;flex:none}
-.logo img{display:block;height:28px;width:auto}
+.logo img{display:block;height:26px;width:auto}
+@media (max-width:560px){header.top .logo img{height:22px}}
 footer .logo img{height:24px}
 .logo .lg-dark{display:none}
 html[data-theme="dark"] .logo .lg-light{display:none}
@@ -419,7 +420,7 @@ html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="da
 
 <header class="top">
   <div class="wrap">
-    <a class="logo" href="#inicio" aria-label="DrasTec inicio"><img class="lg-light" src="img/logo/dtec-fondo-claro.svg" alt="DTEC" height="28"><img class="lg-dark" src="img/logo/dtec-fondo-oscuro-azul.svg" alt="DTEC" height="28"></a>
+    <a class="logo" href="#inicio" aria-label="DrasTec inicio"><img class="lg-light" src="img/logo/drastec-fondo-claro.svg" alt="DRASTEC" height="26"><img class="lg-dark" src="img/logo/drastec-fondo-oscuro-azul.svg" alt="DRASTEC" height="26"></a>
     <nav class="main" aria-label="Principal">
       <a href="#inicio" data-nav="inicio">Inicio</a>
       <a href="#catalogo" data-nav="catalogo">Catálogo</a>
