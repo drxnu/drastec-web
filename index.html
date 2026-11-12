@@ -157,6 +157,30 @@ table.spec{width:100%;border-collapse:collapse;font-size:14px}
 table.spec th{text-align:left;font-weight:500;color:var(--muted);width:38%;padding:9px 0;border-bottom:1px solid var(--line)}
 table.spec td{padding:9px 0 9px 10px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:13px}
 .perks{display:grid;gap:8px;margin-top:18px;font-size:14px}
+.pold{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;font-size:14px}
+.pold s{color:var(--muted)}
+.poff{background:#DC2626;color:#fff;font-weight:800;font-size:13px;padding:3px 8px;border-radius:6px}
+.psave{color:#16A34A;font-weight:700;font-size:13px}
+.pdp .price.pbig{font-size:clamp(34px,4vw,42px);margin-block:2px 4px;line-height:1.1}
+.payways{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0 4px;font-size:12.5px;color:var(--muted)}
+.payways b{font-weight:600;color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:3px 8px;background:var(--surface)}
+.btn.pwa{margin-top:10px;background:#25D366;color:#fff;border-color:#25D366;gap:8px;display:inline-flex;align-items:center}
+.specacc{margin-top:22px;border:1px solid var(--line);border-radius:12px;padding:0 14px}
+.specacc summary{cursor:pointer;font-weight:700;padding:13px 0;list-style:none;display:flex;justify-content:space-between}
+.specacc summary::-webkit-details-marker{display:none}
+.specacc summary::after{content:"+";font-size:20px;line-height:1;color:var(--blue)}
+.specacc[open] summary::after{content:"−"}
+.specacc .specbox{margin-top:0}
+.stickybuy{display:none}
+@media (max-width:900px){
+  .stickybuy{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(0,0,0,.12)}
+  .stickybuy div{display:flex;flex-direction:column;min-width:0}
+  .stickybuy small{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stickybuy b{font-size:20px;font-variant-numeric:tabular-nums}
+  .stickybuy .btn{flex:0 0 auto;padding-inline:22px}
+  body:has(.stickybuy) .wabox{bottom:84px}
+  body:has(.stickybuy) footer{padding-bottom:90px}
+}
 .perks div{display:flex;gap:10px;align-items:start}
 .perks svg{flex:none;color:var(--ok);margin-top:2px}
 
@@ -713,8 +737,10 @@ function viewProduct(id){
       <span class="brand muted" style="font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:13px">${p.brand} · <span class="mono">SKU ${p.id.toUpperCase()}</span></span>
       <h1>${esc(p.name)}</h1>
       <div class="stock">${stockPill(p)} ${p.tag?`<span class="pill">${p.tag}</span>`:""}</div>
-      <div class="price">${priceHtml(p)}</div>
-      ${p.price==null?"":`<div class="usd">≈ US$ ${(p.price/FX).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} al tipo de cambio de S/ ${FX.toFixed(2)}</div>`}
+      ${p.price!=null&&p.old>p.price?`<div class="pold"><s>${soles(p.old)}</s><span class="poff">-${Math.round((1-p.price/p.old)*100)}%</span><span class="psave">Ahorras ${soles(p.old-p.price)}</span></div>`:""}
+      <div class="price pbig">${p.price==null?priceHtml(p):soles(p.price)}</div>
+      ${p.price==null?"":`<div class="usd">≈ US$ ${(p.price/FX).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} al tipo de cambio de S/ ${FX.toFixed(2)}</div>
+      <div class="payways"><span>Paga con</span><b>Yape</b><b>Plin</b><b>Transferencia</b><b>Pago de servicios</b></div>`}
       ${shipBadge(p)}
       <p class="muted" style="margin:0">Precio incluye IGV y envío a domicilio. Boleta o factura electrónica.</p>
       <div class="buyrow">
@@ -722,12 +748,14 @@ function viewProduct(id){
         <button class="btn" id="padd" ${noBuy(p)?"disabled":""}>Agregar al carrito</button>
         <button class="btn orange" id="pbuy" ${noBuy(p)?"disabled":""}>Comprar ahora</button>
       </div>
+      <a class="btn wa pwa" target="_blank" rel="noopener" href="https://wa.me/${WA}?text=${encodeURIComponent(`Hola DrasTec, me interesa: ${p.name} (SKU ${p.id.toUpperCase()}). ¿Tienen stock?\n${location.href.split("#")[0]}#producto-${p.id}`)}"><svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3zm0 23.6c-2 0-3.9-.5-5.6-1.5l-.4-.2-3.9 1 1-3.8-.3-.4A10.6 10.6 0 1 1 16 26.6zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.7 8.7 0 0 1-4.3-3.8c-.3-.6.3-.5 1-1.7.1-.2 0-.4 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8.9 3.8.8a3.2 3.2 0 0 0 2.1-1.5 2.6 2.6 0 0 0 .2-1.5c-.1-.2-.3-.3-.6-.4z"/></svg>Consultar por WhatsApp</a>
+      ${noBuy(p)||p.price==null?"":`<div class="stickybuy"><div><small>${esc(p.name)}</small><b>${soles(p.price)}</b></div><button class="btn" id="pbuy2">Comprar ahora</button></div>`}
       <div class="perks">
         <div>${tick()}<span><b>Envío a domicilio cubierto</b> Lima 24–48 h · Provincias 2–4 días</span></div>
         <div>${tick()}<span><b>Recojo gratis</b> en tienda, previa coordinación</span></div>
         <div>${tick()}<span><b>Soporte post-venta</b> configuración inicial y migración de archivos</span></div>
       </div>
-      <div class="specbox"><table class="spec"><tbody>${rows.map(r=>`<tr><th>${r[0]}</th><td>${esc(r[1])}</td></tr>`).join("")}</tbody></table></div>
+      <details class="specacc" id="specacc"><summary>Ficha técnica</summary><div class="specbox"><table class="spec"><tbody>${rows.map(r=>`<tr><th>${r[0]}</th><td>${esc(r[1])}</td></tr>`).join("")}</tbody></table></div></details>
     </div>
   </div>
   ${related.length?`<section class="block"><div class="sechead"><h2>También te puede interesar</h2></div><div class="grid">${related.map(card).join("")}</div></section>`:""}`;
@@ -740,6 +768,8 @@ function bindProduct(id){
   document.getElementById("qp").onclick=()=>{pdpQty=Math.min(Math.max(p.stock,1),pdpQty+1);qv.textContent=pdpQty};
   document.getElementById("padd").onclick=()=>addToCart(id,pdpQty);
   document.getElementById("pbuy").onclick=()=>{addToCart(id,pdpQty); location.hash="carrito";};
+  const b2=document.getElementById("pbuy2"); if(b2) b2.onclick=()=>{addToCart(id,pdpQty); location.hash="carrito";};
+  const sa=document.getElementById("specacc"); if(sa && innerWidth>900) sa.open=true;
 }
 
 const checkout = {name:"",dni:"",phone:"",zone:"lima",addr:"",pay:"transfer",doc:"boleta",ruc:"",rs:"",dirf:""};
