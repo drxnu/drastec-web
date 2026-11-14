@@ -772,6 +772,7 @@ function bindProduct(id){
   const sa=document.getElementById("specacc"); if(sa && innerWidth>900) sa.open=true;
 }
 
+const rucOk = r => { const w=[5,4,3,2,7,6,5,4,3,2]; const t=w.reduce((a,x,i)=>a+x*+r[i],0); const d=(11-t%11)%10; return d===+r[10]; };
 const checkout = {name:"",dni:"",phone:"",zone:"lima",addr:"",pay:"transfer",doc:"boleta",ruc:"",rs:"",dirf:""};
 let order = null;
 function cartLines(){ return Object.entries(cart).filter(([id,q])=>q>0&&byId(id)).map(([id,q])=>({p:byId(id),q})); }
@@ -860,7 +861,7 @@ function bindCart(){
     if(checkout.name.length<3) err.push("tu nombre");
     if(!/^\d{8}$/.test(checkout.dni)) err.push("un DNI de 8 dígitos");
     if(checkout.doc==="factura"){
-      if(!/^(10|15|17|20)\d{9}$/.test(checkout.ruc)) err.push("un RUC válido de 11 dígitos");
+      if(!/^(10|15|17|20)\d{9}$/.test(checkout.ruc)||!rucOk(checkout.ruc)) err.push("un RUC válido de 11 dígitos (revisa que esté bien escrito)");
       if(checkout.rs.length<3) err.push("la razón social");
       if(checkout.dirf.length<5) err.push("la dirección fiscal");
     }
