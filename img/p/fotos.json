@@ -411,7 +411,11 @@
 "img/p/mo-044-5.webp"
 ],
 "mo-045": [
-"img/p/mo-045-1.webp"
+"img/p/mo-045-1.webp",
+"img/p/mo-045-2.webp",
+"img/p/mo-045-3.webp",
+"img/p/mo-045-4.webp",
+"img/p/mo-045-5.webp"
 ],
 "pc-001": [
 "img/p/pc-001-1.webp",
@@ -426,6 +430,13 @@
 "img/p/rd-001-3.webp",
 "img/p/rd-001-4.webp",
 "img/p/rd-001-5.webp"
+],
+"rd-009": [
+"img/p/rd-009-1.webp",
+"img/p/rd-009-2.webp",
+"img/p/rd-009-3.webp",
+"img/p/rd-009-4.webp",
+"img/p/rd-009-5.webp"
 ],
 "rf-001": [
 "img/p/rf-001-1.webp",
