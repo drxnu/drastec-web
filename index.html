@@ -35,7 +35,7 @@ h1,h2,h3{text-wrap:balance;line-height:1.15;margin:0}
 a{color:var(--blue)}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--orange);outline-offset:2px}
-.wrap{max-width:1440px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:min(1600px,max(1180px,76vw));margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .mono{font-family:var(--mono)}
 .tnum{font-variant-numeric:tabular-nums}
 
@@ -316,7 +316,7 @@ html[data-theme="dark"] .catnav button.on .ic{background:var(--blue)}
 /* Anuncio principal: de borde a borde con margen fino y esquinas redondas; en computadora llena la ventana visible (--chrome = alto de cabecera + franja) */
 html,body{overflow-x:clip}
 @media (min-width:901px){
-  .slider{margin-top:-10px;border-radius:18px;height:calc(100svh - var(--chrome,110px) - 24px - 124px);min-height:340px;max-height:540px}
+  .slider{margin-top:-10px;border-radius:18px;aspect-ratio:14/5;height:auto;min-height:400px}
   .slider .slide{padding-inline:48px;height:100%}
   .slide.intel .hero-art{position:absolute;right:48px;top:7%;bottom:-6%;width:auto}
   .slide.intel .pcb{height:100%;width:auto}
