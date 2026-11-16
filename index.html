@@ -157,6 +157,16 @@ table.spec{width:100%;border-collapse:collapse;font-size:14px}
 table.spec th{text-align:left;font-weight:500;color:var(--muted);width:38%;padding:9px 0;border-bottom:1px solid var(--line)}
 table.spec td{padding:9px 0 9px 10px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:13px}
 .perks{display:grid;gap:8px;margin-top:18px;font-size:14px}
+.tbtn{display:flex;align-items:center;gap:10px;width:100%;margin-top:14px;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg);font:600 14px var(--sans);text-align:left;cursor:pointer;transition:background .15s,border-color .15s}
+.tbtn:hover{border-color:#16A34A}
+.tbtn .tk{flex:0 0 22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;color:transparent;transition:all .15s}
+.tbtn[aria-pressed="true"]{background:#DCFCE7;border-color:#16A34A;color:#14532D}
+.tbtn[aria-pressed="true"] .tk{background:#16A34A;border-color:#16A34A;color:#fff}
+html[data-theme="dark"] .tbtn[aria-pressed="true"]{background:rgba(22,163,74,.18);color:#BBF7D0}
+.tbtn.tsm{grid-column:1/-1;margin-top:0;padding:10px 12px;font-size:13.5px}
+.tlinks{margin:6px 2px 0;font-size:12.5px;color:var(--muted)}
+.rucst{font-size:12px;font-weight:600;min-height:0;color:var(--muted)}
+.rucst.ok{color:#16A34A}.rucst.bad{color:#DC2626}
 .card .img:has(img.ph),.gallery:has(img.ph){background:#fff}
 .gal{position:relative;min-width:0}
 .gmain{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;place-items:initial}
@@ -801,7 +811,25 @@ function bindProduct(id){
 }
 
 const rucOk = r => { const w=[5,4,3,2,7,6,5,4,3,2]; const t=w.reduce((a,x,i)=>a+x*+r[i],0); const d=(11-t%11)%10; return d===+r[10]; };
-const checkout = {name:"",dni:"",phone:"",zone:"lima",addr:"",pay:"transfer",doc:"boleta",ruc:"",rs:"",dirf:""};
+const checkout = {name:"",dni:"",phone:"",zone:"lima",addr:"",pay:"transfer",doc:"boleta",ruc:"",rs:"",dirf:"",terms:false,sameAddr:false};
+/* Consulta RUC: servicio propio en Cloudflare que consulta datos públicos de SUNAT. Vacío = desactivado (el cliente escribe los datos). */
+const RUC_API="";
+const _rucCache={};
+async function lookupRuc(n){
+  const st=document.getElementById("rucst"); if(!st) return;
+  if(!/^(10|15|17|20)\d{9}$/.test(n)||!rucOk(n)){ st.textContent="Revisa el RUC: el número no es válido."; st.className="rucst bad"; return; }
+  if(!RUC_API){ st.textContent=""; return; }
+  st.textContent="Buscando en SUNAT…"; st.className="rucst";
+  try{
+    const d=_rucCache[n]||await fetch(RUC_API+"?numero="+n).then(r=>{ if(!r.ok) throw r.status; return r.json(); });
+    _rucCache[n]=d;
+    if(document.getElementById("c-ruc").value!==n) return;
+    const dir=[d.direccion,d.distrito,d.provincia,d.departamento].map(x=>(x||"").trim()).filter(x=>x&&x!=="-").join(", ");
+    document.getElementById("c-rs").value=d.nombre||d.razonSocial||"";
+    const df=document.getElementById("c-dirf"); df.value=dir; df.dispatchEvent(new Event("input"));
+    st.textContent=(d.estado&&d.estado!=="ACTIVO")?`⚠ SUNAT: ${d.estado} / ${d.condicion||""}`:"✓ Datos traídos de SUNAT"; st.className="rucst "+((d.estado&&d.estado!=="ACTIVO")?"bad":"ok");
+  }catch(e){ st.textContent="No pudimos consultar SUNAT. Escribe la razón social y dirección."; st.className="rucst bad"; }
+}
 let order = null;
 function cartLines(){ return Object.entries(cart).filter(([id,q])=>q>0&&byId(id)).map(([id,q])=>({p:byId(id),q})); }
 function totals(){ const lines=cartLines(); const sub=lines.reduce((a,l)=>a+l.p.price*l.q,0); const ship = !lines.length?0: checkout.zone==="recojo"?0:SHIP[checkout.zone]; return {lines,sub,ship,total:sub+ship}; }
@@ -823,7 +851,7 @@ function viewCart(){
           <label><input type="radio" name="doc" value="factura" ${checkout.doc==="factura"?"checked":""}><span><b>Factura</b><small>Para empresas, con RUC</small></span></label>
         </div>
         <div class="fields" id="factf" ${checkout.doc==="factura"?"":"hidden"}>
-          <label class="field"><span style="display:flex;justify-content:space-between;gap:8px">RUC <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank" rel="noopener" style="font-weight:500">Consultar en SUNAT ↗</a></span><input id="c-ruc" inputmode="numeric" maxlength="11" value="${esc(checkout.ruc)}" placeholder="11 dígitos (10… o 20…)"></label>
+          <label class="field"><span style="display:flex;justify-content:space-between;gap:8px">RUC <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank" rel="noopener" style="font-weight:500">Consultar en SUNAT ↗</a></span><input id="c-ruc" inputmode="numeric" maxlength="11" value="${esc(checkout.ruc)}" placeholder="11 dígitos (10… o 20…)"><small class="rucst" id="rucst" aria-live="polite"></small></label>
           <label class="field">Razón social<input id="c-rs" value="${esc(checkout.rs)}" placeholder="Ej. Empresa S.A.C."></label>
           <label class="field" style="grid-column:1/-1">Dirección fiscal<input id="c-dirf" value="${esc(checkout.dirf)}" placeholder="Tal como figura en SUNAT"></label>
         </div>
@@ -833,7 +861,8 @@ function viewCart(){
           <label class="field">DNI<input id="c-dni" required inputmode="numeric" maxlength="8" value="${esc(checkout.dni)}" placeholder="8 dígitos"></label>
           <label class="field">Celular (WhatsApp)<input id="c-phone" required inputmode="tel" value="${esc(checkout.phone)}" placeholder="9XX XXX XXX"></label>
           <label class="field">Entrega<select id="c-zone"><option value="lima">Envío Lima Metropolitana</option><option value="provincia">Envío a provincia (agencia)</option><option value="recojo">Recojo en tienda</option></select></label>
-          <label class="field">Dirección / distrito<input id="c-addr" value="${esc(checkout.addr)}" placeholder="Av. ..., Distrito, Ciudad"></label>
+          <label class="field">Dirección / distrito<input id="c-addr" value="${esc(checkout.addr)}" placeholder="Av. ..., Distrito, Ciudad" ${checkout.sameAddr&&checkout.doc==="factura"?"readonly":""}></label>
+          <button type="button" class="tbtn tsm" id="c-same" aria-pressed="${checkout.sameAddr?"true":"false"}" ${checkout.doc==="factura"?"":"hidden"}><span class="tk" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span><span>Enviar a la misma dirección fiscal</span></button>
         </div>
         <h2 style="margin-top:20px">Forma de pago</h2>
         <div class="paym">
@@ -841,7 +870,8 @@ function viewCart(){
           <label><input type="radio" name="pay" value="yape" ${checkout.pay==="yape"?"checked":""}><span><b>Yape / Plin</b><small>Para montos dentro del límite diario de tu app.</small></span></label>
           <label><input type="radio" name="pay" value="servicios" ${checkout.pay==="servicios"?"checked":""}><span><b>Pago de servicios desde tu banco</b><small>Pagas con un código de pedido en la app de tu banco o agente.</small></span></label>
         </div>
-        <label class="opt" style="display:flex;gap:8px;align-items:flex-start;margin-top:14px;font-size:14px"><input type="checkbox" id="c-terms"> <span>Acepto los <a href="#terminos" target="_blank">Términos y condiciones</a> y la <a href="#privacidad" target="_blank">Política de privacidad</a>.</span></label>
+        <button type="button" class="tbtn" id="c-terms" aria-pressed="${checkout.terms?"true":"false"}"><span class="tk" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span><span>Acepto los Términos y condiciones y la Política de privacidad</span></button>
+        <p class="tlinks">Leer: <a href="#terminos" target="_blank">Términos y condiciones</a> · <a href="#privacidad" target="_blank">Política de privacidad</a></p>
         <p id="ferr" class="pill warn" hidden style="margin-top:12px;border-radius:8px;padding:8px 12px"></p>
       </form>
     </div>
@@ -878,7 +908,14 @@ function bindCart(){
   if(order){ bindOrder(); return; }
   const z=document.getElementById("c-zone"); if(!z) return;
   z.value=checkout.zone;
-  app.querySelectorAll('input[name="doc"]').forEach(r=>r.onchange=()=>{ document.getElementById("factf").hidden=(r.value!=="factura"); });
+  const same=document.getElementById("c-same"), addr=document.getElementById("c-addr"), dirf=document.getElementById("c-dirf"), ruc=document.getElementById("c-ruc");
+  const syncSame=()=>{ const on=checkout.sameAddr&&checkout.doc==="factura"; same.setAttribute("aria-pressed",String(!!checkout.sameAddr)); addr.readOnly=on; if(on) addr.value=dirf.value; };
+  app.querySelectorAll('input[name="doc"]').forEach(r=>r.onchange=()=>{ checkout.doc=r.value; document.getElementById("factf").hidden=(r.value!=="factura"); same.hidden=(r.value!=="factura"); syncSame(); });
+  const tb=document.getElementById("c-terms"); tb.onclick=()=>{ checkout.terms=!checkout.terms; tb.setAttribute("aria-pressed",String(checkout.terms)); };
+  same.onclick=()=>{ checkout.sameAddr=!checkout.sameAddr; if(!checkout.sameAddr) addr.value=""; syncSame(); if(!checkout.sameAddr) addr.focus(); };
+  dirf.addEventListener("input",syncSame);
+  ruc.addEventListener("input",()=>{ ruc.value=ruc.value.replace(/\D/g,"").slice(0,11); if(ruc.value.length===11) lookupRuc(ruc.value); else document.getElementById("rucst").textContent=""; });
+  syncSame();
   app.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ readForm(); const p=byId(b.dataset.q); cart[p.id]=Math.max(0,Math.min(p.stock,(cart[p.id]||0)+(+b.dataset.d))); if(!cart[p.id]) delete cart[p.id]; saveCart(); render(); });
   app.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{ readForm(); delete cart[b.dataset.rm]; saveCart(); render(); });
   z.onchange=()=>{ readForm(); const t=totals(); document.getElementById("tship").textContent=t.ship?soles(t.ship):"Cubierto"; document.getElementById("ttotal").textContent=soles(t.total); };
@@ -895,7 +932,7 @@ function bindCart(){
     }
     if(!/^9\d{8}$/.test(checkout.phone.replace(/\s/g,""))) err.push("un celular de 9 dígitos que empiece con 9");
     if(checkout.zone!=="recojo" && checkout.addr.length<5) err.push("la dirección de envío");
-    if(!document.getElementById("c-terms").checked) err.push("aceptar los términos y condiciones");
+    if(!checkout.terms) err.push("aceptar los términos y condiciones");
     const fe=document.getElementById("ferr");
     if(err.length){ fe.textContent="Falta completar: "+err.join(", ")+"."; fe.hidden=false; return; }
     fe.hidden=true;
