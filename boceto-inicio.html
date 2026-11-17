@@ -66,6 +66,23 @@ header .cart{background:var(--blue);color:#fff;border-radius:8px;padding:8px 14p
 .gam .marcas{color:#fff;opacity:.92}
 .gb{font-weight:800;font-size:19px;letter-spacing:.06em;font-style:italic}
 
+/* Variante celular "lado a lado" (boceto-inicio.html?movil=junto) */
+@media (max-width:900px){
+  .junto .split{grid-template-columns:1fr 1fr;gap:8px;padding:8px;min-height:0}
+  .junto .half{padding:14px 12px;border-radius:20px}
+  .junto .tag{font-size:9px;letter-spacing:.08em;margin-bottom:6px}
+  .junto .half h2{font-size:17px;line-height:1.1}
+  .junto .half p{display:none}
+  .junto .btns{flex-direction:column;gap:6px;margin-top:12px}
+  .junto .btn{padding:8px 10px;font-size:12px;text-align:center}
+  .junto .marcas{gap:10px;margin-top:12px;justify-content:center}
+  .junto .marcas{gap:8px}.junto .marcas svg{height:13px;width:auto}.junto .gb{font-size:10px}
+  .junto .stage{min-height:0;flex:none;display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:16px}
+  .junto .stage img{position:static;max-width:100%!important;max-height:none}
+  .junto .ofi .pc,.junto .gam .pc{order:2}
+  .junto .ofi .pc{max-width:92%!important}.junto .gam .pc{max-width:52%!important}
+}
+
 .below{padding:28px 5vw;color:var(--muted)}
 .below .cats{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
 .below .cats div{border:1px solid var(--line);border-radius:12px;height:90px;display:grid;place-items:center;font-weight:600;color:var(--fg)}
@@ -84,6 +101,7 @@ header .cart{background:var(--blue);color:#fff;border-radius:8px;padding:8px 14p
 </style>
 </head>
 <body>
+<script>if(/movil=junto/.test(location.search))document.body.classList.add("junto")</script>
 <header>
   <a href="index.html"><img src="img/logo/drastec-fondo-claro.svg" alt="DRASTEC" height="26"></a>
   <nav><a href="index.html">Inicio</a><a href="index.html#catalogo">Catálogo</a><a href="index.html#soporte">Soporte técnico</a></nav>
