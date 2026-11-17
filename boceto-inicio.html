@@ -19,58 +19,54 @@ header .cart{background:var(--blue);color:#fff;border-radius:8px;padding:8px 14p
 .strip{background:#000;color:#ddd;font-size:13px;padding:8px 5vw;display:flex;justify-content:space-between}
 .note{background:#FEF3C7;color:#92400E;font-size:13px;text-align:center;padding:6px 16px}
 
-/* Mosaico a lo ancho de toda la pantalla: izquierda oficina, derecha gaming */
-.mosaic{display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(2,max(15.5vw,250px));width:100%}
-.t{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(16px,1.6vw,30px)}
-.t img,.t svg.art{position:absolute;pointer-events:none}
-.t h2{margin:0;font-size:clamp(20px,1.9vw,36px);font-weight:800;letter-spacing:-.02em;line-height:1.1;position:relative}
-.t p{margin:6px 0 0;font-size:clamp(13px,.9vw,16px);opacity:.85;position:relative;max-width:30ch}
-.tag{position:absolute;top:clamp(14px,1.4vw,26px);left:clamp(16px,1.6vw,30px);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
-.btn{display:inline-block;margin-top:14px;padding:9px 18px;border-radius:999px;font-weight:600;font-size:14px;position:relative;align-self:flex-start}
-.t:hover img{transform:scale(1.03)}
-.t img{transition:transform .4s}
+/* Inicio a todo el ancho: izquierda oficina, derecha gaming */
+.split{display:grid;grid-template-columns:1fr 1fr;width:100%;min-height:max(36vw,460px)}
+.half{position:relative;overflow:hidden;display:flex;flex-direction:column;padding:clamp(24px,3vw,56px)}
+.half h2{margin:0;font-size:clamp(26px,2.6vw,48px);font-weight:800;letter-spacing:-.02em;line-height:1.05}
+.half p{margin:10px 0 0;font-size:clamp(14px,1vw,18px);max-width:38ch;opacity:.85}
+.tag{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;position:relative;z-index:2}
+.btn{padding:11px 20px;border-radius:999px;font-weight:600;font-size:14px}
+.stage{position:relative;flex:1;min-height:220px;margin-top:10px}
+.stage img{position:absolute;bottom:0;height:auto;width:auto;max-height:100%;transition:transform .5s}
+.half:hover .stage img{transform:translateY(-4px)}
 
-/* Oficina: claro, azul DrasTec */
-.a{grid-column:1/4;grid-row:1/3;background:linear-gradient(160deg,#EAF0FE,#C7D7FB)}
-.a svg.art{width:92%;left:4%;top:12%}
-.b{grid-column:4/7;grid-row:1;background:#F4F6FA}
-.b img{width:40%;right:6%;top:9%}
-.c{grid-column:4/5;grid-row:2;background:#fff;border-top:1px solid var(--line)}
-.c img{width:86%;left:7%;top:10%}
-.d{grid-column:5/7;grid-row:2;background:var(--blue);color:#fff;justify-content:center;text-align:center;align-items:center}
-.d p{max-width:34ch}
-.d .btn{background:#fff;color:var(--blue);align-self:center}
-.a .btn,.b .btn{background:var(--blue);color:#fff}
+/* Oficina: fondo claro, azul corporativo, cuadrícula suave tipo escritorio */
+.ofi{background:
+  radial-gradient(60% 70% at 70% 75%,rgba(37,99,235,.18),transparent 70%),
+  linear-gradient(rgba(37,99,235,.06) 1px,transparent 1px) 0 0/40px 40px,
+  linear-gradient(90deg,rgba(37,99,235,.06) 1px,transparent 1px) 0 0/40px 40px,
+  linear-gradient(160deg,#F8FAFF,#DCE7FD)}
+.ofi .tag{color:var(--blue)}
+.ofi .btn.p{background:var(--blue);color:#fff}
+.ofi .btn.s{background:#fff;color:var(--blue);border:1px solid #BFD0F8}
+.ofi .pc{max-width:min(58%,640px);right:2%;bottom:6%;filter:drop-shadow(0 24px 30px rgba(15,27,45,.22))}
+.ofi .lap{max-width:min(50%,560px);left:10%;bottom:0;filter:drop-shadow(0 26px 30px rgba(15,27,45,.28))}
 
-/* Gaming: oscuro, luces RGB */
-.e{grid-column:7/9;grid-row:2;background:#0B0B0F;color:#fff;justify-content:center;text-align:center;align-items:center}
-.e h2 span{background:linear-gradient(90deg,#22D3EE,#A855F7,#F43F5E);-webkit-background-clip:text;background-clip:text;color:transparent}
-.e .btn{background:linear-gradient(90deg,#06B6D4,#8B5CF6);color:#fff;align-self:center}
-.f{grid-column:7/10;grid-row:1;background:radial-gradient(120% 90% at 70% 30%,#3B0764,#0B0B0F 70%);color:#fff}
-.f svg.art{width:46%;right:4%;top:4%}
-.g{grid-column:9/10;grid-row:2;background:#fff;color:var(--fg);border-top:4px solid #8B5CF6}
-.g img{width:92%;left:4%;top:16%}
-.h{grid-column:10/13;grid-row:1/3;background:#000;color:#fff}
-.h img{width:100%;height:100%;object-fit:cover;inset:0}
-.h::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85),transparent 45%);z-index:1}
-.h>*:not(img){z-index:2}
-.f .btn,.h .btn{background:#fff;color:#000}
-.f .tag{color:#C084FC}.h .tag{color:#4ADE80}.a .tag,.b .tag{color:var(--blue)}
+/* Gaming: fondo oscuro con brillo rojo/morado/cian */
+.gam{color:#fff;background:
+  radial-gradient(45% 55% at 30% 80%,rgba(225,29,72,.45),transparent 70%),
+  radial-gradient(45% 60% at 80% 60%,rgba(124,58,237,.5),transparent 70%),
+  radial-gradient(30% 40% at 90% 10%,rgba(6,182,212,.25),transparent 70%),
+  linear-gradient(160deg,#0B0B12,#05050A)}
+.gam::after{content:"";position:absolute;inset:auto 0 0 0;height:3px;background:linear-gradient(90deg,#06B6D4,#8B5CF6,#E11D48)}
+.gam .tag{background:linear-gradient(90deg,#22D3EE,#A855F7,#F43F5E);-webkit-background-clip:text;background-clip:text;color:transparent;align-self:flex-start}
+.gam .btn.p{background:linear-gradient(90deg,#E11D48,#8B5CF6);color:#fff}
+.gam .btn.s{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.25)}
+.gam .pc{max-height:min(100%,520px);right:6%;bottom:0;filter:drop-shadow(0 0 40px rgba(124,58,237,.45))}
+.gam .lap{max-width:min(55%,560px);left:4%;bottom:0;filter:drop-shadow(0 20px 40px rgba(225,29,72,.35))}
 
 .below{padding:28px 5vw;color:var(--muted)}
 .below .cats{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
 .below .cats div{border:1px solid var(--line);border-radius:12px;height:90px;display:grid;place-items:center;font-weight:600;color:var(--fg)}
 
-/* Celular: cada mitad apilada, en 2 columnas */
 @media (max-width:900px){
   header nav{display:none}
-  .mosaic{grid-template-columns:1fr 1fr;grid-template-rows:none;grid-auto-rows:minmax(200px,auto)}
-  .a,.b,.c,.d,.e,.f,.g,.h{grid-column:auto;grid-row:auto}
-  .d{order:0;grid-column:1/3;min-height:150px}.a{order:1;grid-column:1/3;min-height:300px}.b{order:2}.c{order:3}
-  .e{order:4;grid-column:1/3;min-height:150px}.h{order:5;grid-column:1/3;min-height:360px}.f{order:6}.g{order:7}
-  .t img,.t svg.art{position:static;width:80%!important;margin:28px auto 12px;display:block}
-  .a svg.art{width:86%!important}
-  .h img{position:absolute;width:100%!important;margin:0}
+  .split{grid-template-columns:1fr}
+  .stage{min-height:62vw}
+  .gam .pc{max-width:34%}
+  .ofi .lap,.gam .lap{max-width:62%}
+  .ofi .pc{max-width:64%}
   .below .cats{grid-template-columns:repeat(3,1fr)}
 }
 </style>
@@ -84,74 +80,27 @@ header .cart{background:var(--blue);color:#fff;border-radius:8px;padding:8px 14p
 <div class="strip"><span>Envíos a todo el Perú · Garantía local</span><span>T.C S/ 3.49</span></div>
 <div class="note">Boceto: así se vería el inicio usando todo el ancho de la pantalla. Aún no reemplaza la página real.</div>
 
-<section class="mosaic" aria-label="Oficina y gaming">
-  <!-- OFICINA -->
-  <a class="t a" href="index.html#catalogo">
-    <span class="tag">Oficina</span>
-    <svg class="art" viewBox="0 0 320 220" aria-hidden="true">
-      <defs><linearGradient id="scr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1D4ED8"/><stop offset="1" stop-color="#60A5FA"/></linearGradient>
-      <linearGradient id="alu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E5E7EB"/><stop offset="1" stop-color="#9CA3AF"/></linearGradient></defs>
-      <rect x="58" y="18" width="204" height="132" rx="9" fill="#1F2937"/>
-      <rect x="66" y="26" width="188" height="116" rx="3" fill="url(#scr)"/>
-      <rect x="78" y="40" width="80" height="8" rx="3" fill="#fff" opacity=".9"/>
-      <rect x="78" y="56" width="160" height="5" rx="2" fill="#fff" opacity=".45"/><rect x="78" y="66" width="140" height="5" rx="2" fill="#fff" opacity=".45"/>
-      <rect x="78" y="84" width="48" height="44" rx="4" fill="#fff" opacity=".25"/><rect x="134" y="84" width="48" height="44" rx="4" fill="#fff" opacity=".25"/><rect x="190" y="84" width="48" height="44" rx="4" fill="#fff" opacity=".25"/>
-      <path d="M30 152h260l-14 18H44z" fill="url(#alu)"/><rect x="136" y="152" width="48" height="5" rx="2.5" fill="#6B7280"/>
-    </svg>
-    <h2>Laptops para oficina</h2>
-    <p>Lenovo, HP, Dell, ASUS y Acer para trabajar y estudiar.</p>
-    <span class="btn">Ver laptops</span>
-  </a>
-  <a class="t b" href="index.html#catalogo">
-    <span class="tag">De fábrica</span>
-    <img src="img/p/pc-001-1.webp" alt="Mini PC ASUS NUC">
-    <h2>PCs de marca</h2>
-    <p>Equipos listos para usar, con garantía del fabricante.</p>
-    <span class="btn">Ver equipos</span>
-  </a>
-  <a class="t c" href="index.html#catalogo">
-    <img src="img/p/mo-038-1.webp" alt="Monitor">
-    <p style="font-weight:600;opacity:1">Monitores</p>
-  </a>
-  <a class="t d" href="index.html#catalogo">
-    <h2>Todo para tu oficina</h2>
-    <p>Laptops y PCs de marca con soporte técnico propio en Lima.</p>
-    <span class="btn">Comprar para oficina</span>
-  </a>
-
-  <!-- GAMING -->
-  <a class="t e" href="index.html#catalogo">
-    <h2><span>Zona gamer</span></h2>
-    <p>PCs armadas a tu medida y laptops gamer con RTX.</p>
-    <span class="btn">Ver gaming</span>
-  </a>
-  <a class="t f" href="index.html#catalogo">
-    <span class="tag">Gamer</span>
-    <svg class="art" viewBox="0 0 320 220" aria-hidden="true">
-      <defs><linearGradient id="rgb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22D3EE"/><stop offset=".5" stop-color="#A855F7"/><stop offset="1" stop-color="#F43F5E"/></linearGradient>
-      <linearGradient id="gs" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C3AED"/><stop offset="1" stop-color="#0EA5E9"/></linearGradient></defs>
-      <rect x="58" y="18" width="204" height="132" rx="7" fill="#111"/>
-      <rect x="65" y="25" width="190" height="118" rx="2" fill="url(#gs)"/>
-      <path d="M65 120 L120 70 L160 100 L210 50 L255 85 L255 143 L65 143Z" fill="#0B0B0F" opacity=".55"/>
-      <path d="M26 152h268l-16 20H42z" fill="#1F2937"/>
-      <rect x="44" y="155" width="232" height="4" rx="2" fill="url(#rgb)"/>
-      <rect x="40" y="170" width="240" height="3" rx="1.5" fill="url(#rgb)" opacity=".7"/>
-    </svg>
-    <h2>Laptops gamer</h2>
-    <p>ASUS TUF, ROG, Lenovo LOQ con RTX 4050/4060.</p>
-    <span class="btn">Ver laptops gamer</span>
-  </a>
-  <a class="t g" href="index.html#catalogo">
-    <img src="img/p/gv-007-1.webp" alt="Tarjeta de video">
-    <p style="font-weight:600;opacity:1">Tarjetas de video</p>
-  </a>
-  <a class="t h" href="index.html#catalogo">
-    <img src="img/pc-destacada.webp" alt="PC gamer armada">
-    <span class="tag">Armadas por DrasTec</span>
-    <h2>PCs armadas a tu medida</h2>
-    <p>Elige procesador, tarjeta de video y memoria. La armamos, la probamos y te la enviamos.</p>
-    <span class="btn">Armar mi PC</span>
-  </a>
+<section class="split" aria-label="Oficina y gaming">
+  <div class="half ofi">
+    <span class="tag">Oficina y empresa</span>
+    <h2>Laptops y PCs para trabajar</h2>
+    <p>Equipos de marca listos para usar, con garantía del fabricante y soporte técnico propio en Lima.</p>
+    <div class="btns"><a class="btn p" href="index.html#catalogo">Laptops de oficina</a><a class="btn s" href="index.html#catalogo">PCs de oficina</a></div>
+    <div class="stage">
+      <img class="pc" src="img/hero/oficina-pc.webp" alt="PC de escritorio ASUS ExpertCenter con monitor">
+      <img class="lap" src="img/hero/oficina-laptop.webp" alt="Laptop ASUS ExpertBook P1">
+    </div>
+  </div>
+  <div class="half gam">
+    <span class="tag">Zona gamer</span>
+    <h2>PCs armadas y laptops gamer</h2>
+    <p>Armamos tu PC a medida con las piezas que elijas, y laptops gamer con tarjetas RTX.</p>
+    <div class="btns"><a class="btn p" href="index.html#catalogo">Armar mi PC</a><a class="btn s" href="index.html#catalogo">Laptops gamer</a></div>
+    <div class="stage">
+      <img class="pc" src="img/hero/gamer-pc.webp" alt="PC gamer en case ROG Hyperion">
+      <img class="lap" src="img/hero/gamer-laptop.webp" alt="Laptop gamer ASUS ROG Strix G16">
+    </div>
+  </div>
 </section>
 
 <div class="below">
